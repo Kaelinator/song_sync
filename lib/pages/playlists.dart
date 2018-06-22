@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:path_provider/path_provider.dart";
+import "package:path/path.dart";
 import "dart:io";
 import "dart:async";
 
@@ -11,7 +12,6 @@ class PlaylistPage extends StatefulWidget {
 
 class PlaylistPageState extends State<PlaylistPage> {
 
-  // Directory _playlistsDir;
   List<File> playlists = new List<File>();
 
   @override
@@ -19,11 +19,9 @@ class PlaylistPageState extends State<PlaylistPage> {
     super.initState();
 
     getApplicationDocumentsDirectory()
+      .then((Directory dir) => new Directory(join(dir.path, "playlists")))
       .then(createAbsentDirectories)
-      .then(setPlaylistPaths);
-      // .then((Directory dir) =>
-      //   setState(() => _playlistsDir = dir)
-      // );
+      .then(readPlaylists);
   }
 
   Future<Directory> createAbsentDirectories(Directory dir) {
@@ -34,11 +32,11 @@ class PlaylistPageState extends State<PlaylistPage> {
       );
   }
 
-  void setPlaylistPaths(Directory dir) {
+  void readPlaylists(Directory dir) {
 
     dir.list()
       .listen((FileSystemEntity entity) {
-        if (entity is !File)
+        if (entity is !File || extension(entity.path) != ".json")
           return;
 
         List<File> newPlaylists = List.from(playlists);

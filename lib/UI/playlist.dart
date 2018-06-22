@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:path/path.dart";
 import "dart:io";
 
 class Playlist extends StatelessWidget {
@@ -12,7 +13,7 @@ class Playlist extends StatelessWidget {
     // TODO: implement build
     return new ListTile(
       leading: const Icon(Icons.music_note),
-      title: new Text(jsonData.path)
+      title: new Text(basenameWithoutExtension(jsonData.path))
     );
   }
 }

@@ -1,17 +1,18 @@
 import "package:flutter/material.dart";
+import "dart:io";
 
 class Playlist extends StatelessWidget {
 
-  final String title;
+  final File jsonData;
 
-  Playlist(this.title);
+  Playlist(this.jsonData);
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return new ListTile(
-      leading: const Icon(Icons.event_seat),
-      title: new Text(this.title),
+      leading: const Icon(Icons.music_note),
+      title: new Text(jsonData.path)
     );
   }
 }

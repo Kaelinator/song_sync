@@ -1,4 +1,4 @@
-package com.example.songsync;
+package com.kaelkirk.songsync;
 
 import android.os.Bundle;
 

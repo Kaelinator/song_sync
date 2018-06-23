@@ -4,21 +4,21 @@ import "package:path/path.dart";
 
 import "dart:io";
 import "dart:async";
-// import "dart:convert";
 
 import "../UI/playlist.dart";
-import "../UI/context_FAB.dart";
+
+import "./edit_playlist.dart";
 
 class PlaylistPage extends StatefulWidget {
+
+  @override
   State createState() => new PlaylistPageState();
 }
 
 class PlaylistPageState extends State<PlaylistPage> {
 
   List<File> playlists = new List<File>();
-  File latestFile;
   Directory playlistDir;
-
 
   @override
   void initState() {
@@ -28,7 +28,6 @@ class PlaylistPageState extends State<PlaylistPage> {
       .then(_setPlaylistDir)
       .then(_createAbsentDirectories)
       .then(readPlaylists);
-    
   }
 
   Future<Directory> _setPlaylistDir(Directory dir) async {
@@ -46,6 +45,13 @@ class PlaylistPageState extends State<PlaylistPage> {
         ? dir
         : dir.create(recursive: true)
       );
+  }
+
+  void reloadPlaylists() {
+
+    playlists = new List<File>();
+
+    readPlaylists(playlistDir);
   }
 
   void readPlaylists(Directory dir) {
@@ -73,6 +79,12 @@ class PlaylistPageState extends State<PlaylistPage> {
         return new Playlist(playlists[index]);
       }
     ),
-    floatingActionButton: new ContextFAB(playlistDir),
+    floatingActionButton: new FloatingActionButton(
+      child: const Icon(Icons.add),
+      onPressed: () => Navigator.push(context,
+        new MaterialPageRoute(builder: (context) => new EditPlaylist())
+      ),
+      tooltip: "Create a new playlist",
+    ),
   );
 }

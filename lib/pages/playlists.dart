@@ -1,10 +1,13 @@
 import "package:flutter/material.dart";
 import "package:path_provider/path_provider.dart";
 import "package:path/path.dart";
+
 import "dart:io";
 import "dart:async";
+// import "dart:convert";
 
 import "../UI/playlist.dart";
+import "../UI/context_FAB.dart";
 
 class PlaylistPage extends StatefulWidget {
   State createState() => new PlaylistPageState();
@@ -13,18 +16,31 @@ class PlaylistPage extends StatefulWidget {
 class PlaylistPageState extends State<PlaylistPage> {
 
   List<File> playlists = new List<File>();
+  File latestFile;
+  Directory playlistDir;
+
 
   @override
   void initState() {
     super.initState();
 
     getApplicationDocumentsDirectory()
-      .then((Directory dir) => new Directory(join(dir.path, "playlists")))
-      .then(createAbsentDirectories)
+      .then(_setPlaylistDir)
+      .then(_createAbsentDirectories)
       .then(readPlaylists);
+    
   }
 
-  Future<Directory> createAbsentDirectories(Directory dir) {
+  Future<Directory> _setPlaylistDir(Directory dir) async {
+
+    Directory newDir = new Directory(join(dir.path, "playlists"));
+
+    setState(() => playlistDir = newDir);
+
+    return newDir;
+  }
+
+  Future<Directory> _createAbsentDirectories(Directory dir) {
     return dir.exists()
       .then((isThere) => (isThere)
         ? dir
@@ -56,6 +72,7 @@ class PlaylistPageState extends State<PlaylistPage> {
       itemBuilder: (BuildContext context, int index) {
         return new Playlist(playlists[index]);
       }
-    )
+    ),
+    floatingActionButton: new ContextFAB(playlistDir),
   );
 }

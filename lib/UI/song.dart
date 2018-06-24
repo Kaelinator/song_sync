@@ -16,7 +16,9 @@ class Song extends StatefulWidget {
   Song.fromJson(Map<String, dynamic> json)
       : title = json["title"],
         address = json["address"],
-        drops = json["drops"];
+        drops = json["drops"]
+          .map<Timestamp>((dynamic v) => Timestamp.fromJson(v))
+          .toList();
 
   Map<String, dynamic> toJson() =>
     {

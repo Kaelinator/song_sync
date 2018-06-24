@@ -50,4 +50,43 @@ void main() {
 
     expect(encoded, expected);
   });
+
+  // no time for this one
+  // test("Decodes Songs", () {
+
+  //   String encoded = 
+  //   r'['
+  //     '{"title":"Blame","address":null,"drops":['
+  //       '{"minutes":0,"seconds":3,"milliseconds":0},'
+  //       '{"minutes":0,"seconds":55,"milliseconds":0}'
+  //     ']},'
+  //     '{"title":"Try Everything", "address":null,"drops":['
+  //       '{"minutes":1,"seconds":0,"milliseconds":0}'
+  //     ']}'
+  //   ']';
+
+  //   List<Song> decoded = json.decode(encoded)
+  //     .map<Song>((dynamic v) => Song.fromJson(v))
+  //     .toList();
+
+  //   // print(Song.fromJson(decoded[0]).title);
+
+  //   List<Song> playlist = [
+  //     new Song(
+  //       title: "Blame",
+  //       drops: <Timestamp>[
+  //         new Timestamp(seconds: 3),
+  //         new Timestamp(seconds: 55)
+  //       ]
+  //     ),
+  //     new Song(
+  //       title: "Try Everything",
+  //       drops: <Timestamp>[
+  //         new Timestamp(minutes: 1)
+  //       ]
+  //     )
+  //   ];
+
+  //   expect(decoded, equals(playlist));
+  // });
 }

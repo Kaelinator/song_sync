@@ -6,9 +6,8 @@ import "dart:io";
 import "dart:async";
 import "dart:convert";
 
-import "../util/song.dart";
 import "../pages/view_playlists.dart";
-import "../UI/song_tile.dart";
+import "../UI/song.dart";
 
 class PlaylistStudio extends StatefulWidget {
 
@@ -104,7 +103,7 @@ class PlaylistStudioState extends State<PlaylistStudio> {
       body: new ListView.builder(
         itemCount: playlist.length,
         itemBuilder: (BuildContext context, int index) {
-          return new SongTile(playlist[index]);
+          return playlist[index];
         }
       ),
       floatingActionButton: new FloatingActionButton(

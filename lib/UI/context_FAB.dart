@@ -20,9 +20,7 @@ class ContextFAB extends StatelessWidget {
 
     return new File(join(playlistDir.path, "$name.json"))
       .create()
-      .then((file) => file.writeAsString("Just a test!")
-        .then((file) => file));
-      // .catchError((error) => setState());
+      .then((file) => file.writeAsString("Just a test!"));
   }
 
   @override

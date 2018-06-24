@@ -14,7 +14,7 @@ class PlaylistTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new ListTile(
-      leading: const Icon(Icons.music_note),
+      leading: const Icon(Icons.album),
       title: new Text(basenameWithoutExtension(playlistFile.path)),
       onLongPress: () => Navigator.push(context,
         new MaterialPageRoute(

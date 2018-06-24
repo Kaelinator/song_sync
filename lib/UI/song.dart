@@ -1,6 +1,8 @@
 
 import "package:flutter/material.dart";
 import "package:uuid/uuid.dart";
+import "package:path/path.dart";
+import "package:path_provider/path_provider.dart";
 
 import "dart:io";
 
@@ -18,7 +20,7 @@ class Song extends StatefulWidget {
 
   Song.fromJson(Map<String, dynamic> json)
       : title = json["title"],
-        address = json["address"],
+        address = new File(json["address"]),
         drops = json["drops"]
           .map<Timestamp>((dynamic v) => Timestamp.fromJson(v))
           .toList(),
@@ -27,7 +29,7 @@ class Song extends StatefulWidget {
   Map<String, dynamic> toJson() =>
     {
       "title": title,
-      "address": address,
+      "address": address.path,
       "drops": (drops ?? []).toList()
     };
 
@@ -45,6 +47,7 @@ class SongState extends State<Song> {
   List<Timestamp> drops;
   String title;
   File address;
+  bool fileExists = false;
   String id;
 
   SongState({this.title, this.address, this.drops, this.id});
@@ -57,15 +60,67 @@ class SongState extends State<Song> {
     playlistView.deleteSong(id);
   }
 
+  void updateValues(BuildContext context) {
+
+    PlaylistStudioState playlistView = context.ancestorStateOfType(
+      const TypeMatcher<PlaylistStudioState>(),
+    );
+
+    playlistView.updateSong(this);
+  }
+
+  void fileChange(String text, BuildContext context) {
+
+    getExternalStorageDirectory()
+      .then((Directory directory) {
+
+        File newAddress = new File(join(directory.path, "Music", text));
+
+        newAddress.exists()
+          .then((isThere) {
+            if (!isThere)
+              return;
+            
+            address = newAddress;
+
+            setState(() {
+              fileExists = isThere;
+              title = basenameWithoutExtension(address.path);
+            });
+            updateValues(context);
+          });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return new ListTile(
-      leading: const Icon(Icons.album),
-      title: new Text(title),
-      trailing: new IconButton(
-        icon: const Icon(Icons.delete),
-        onPressed: () => remove(context),
+    return new Card(
+      child: new Column(
+        // mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          new ListTile(
+            leading: const Icon(Icons.music_note),
+            title: new Text(title)
+          ),
+          new TextField(
+            onChanged: (String text) => fileChange(text, context),
+            style: new TextStyle(
+              color: (fileExists) ? Colors.black : Colors.red
+            )
+          ),
+          new ButtonTheme.bar(
+            child: new ButtonBar(
+              children: <Widget>[
+                new FlatButton(
+                  child: const Text("Delete"),
+                  onPressed: () => remove(context)
+                )
+              ],
+            )
+          )
+        ],
       )
+      
     );
   }
 }

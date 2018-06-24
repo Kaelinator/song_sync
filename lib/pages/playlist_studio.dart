@@ -33,11 +33,34 @@ class PlaylistStudioState extends State<PlaylistStudio> {
   void deleteSong(String id) {
 
     List<Song> newList = List.from(playlist);
-    // bool success = newList.remove(toDelete);
+
     int index = newList.indexWhere((Song s) => s.id == id);
+    if (index == -1)
+      return;
+
     newList.removeAt(index);
 
-    print("$index?");
+    setState(() {
+      playlist = newList;
+    });
+  }
+
+  void updateSong(SongState songData) {
+    
+    List<Song> newList = List.from(playlist);
+
+    int index = newList.indexWhere((Song s) => s.id == songData.id);
+    if (index == -1)
+      return;
+
+    newList[index] = new Song(
+      title: songData.title,
+      address: songData.address,
+      drops: songData.drops
+    );
+
+    print("playlist updated! ${songData.title}");
+
     setState(() {
       playlist = newList;
     });
@@ -54,6 +77,8 @@ class PlaylistStudioState extends State<PlaylistStudio> {
         
         index.readAsString()
           .then((String data) {
+            
+            print(data);
 
             List<Song> decoded = json.decode(data)
               .map<Song>((dynamic v) => Song.fromJson(v))
@@ -90,7 +115,7 @@ class PlaylistStudioState extends State<PlaylistStudio> {
     List<Song> newPlaylist = List.from(playlist);
 
     newPlaylist.add(new Song(
-      title: "Song 1",
+      title: "Song ${playlist.length}",
       id: new Uuid().v4()
     ));
 

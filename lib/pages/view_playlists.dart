@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:path_provider/path_provider.dart";
 import "package:path/path.dart";
+import "package:watcher/watcher.dart";
 
 import "dart:io";
 import "dart:async";
@@ -21,15 +22,25 @@ class PlaylistPageState extends State<PlaylistPage> {
 
   List<File> playlists = new List<File>();
   Directory playlistDir;
+  DirectoryWatcher watcher;
 
   @override
   void initState() {
     super.initState();
 
+
     getApplicationDocumentsDirectory()
       .then(_setPlaylistDir)
       .then(_createAbsentDirectories)
-      .then(readPlaylists);
+      .then(readPlaylists)
+      .whenComplete(() {
+
+        watcher = new DirectoryWatcher(playlistDir.path);
+        watcher.events.listen((WatchEvent event) {
+          // if (event is )
+          reloadPlaylists();
+        });
+      });
   }
 
   Future<Directory> _setPlaylistDir(Directory dir) async {

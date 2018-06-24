@@ -23,6 +23,7 @@ class PlaylistStudioState extends State<PlaylistStudio> {
 
   String name;
   File index;
+  bool deleting = false; // it was recreating it in the dispose method, temp fix
   List<Song> playlist = new List<Song>();
 
   PlaylistStudioState(this.index) {
@@ -39,13 +40,24 @@ class PlaylistStudioState extends State<PlaylistStudio> {
           return;
         
         index.readAsString()
-          .then((String data) => json.decode(data));
+          .then((String data) {
+
+            List<Song> decoded = json.decode(data)
+              .map<Song>((dynamic v) => Song.fromJson(v))
+              .toList();
+
+            setState(() {
+              playlist = decoded;
+            });
+          });
       });
   }
 
   @override
   void dispose() {
-    // TODO: save JSON data
+
+    if (!deleting)
+      createFile();
 
     super.dispose();
   }
@@ -56,7 +68,8 @@ class PlaylistStudioState extends State<PlaylistStudio> {
 
     return index.exists()
       .then((bool isThere) => isThere ? index.create() : Future.value(index))
-      .then((File file) => file.writeAsString("Just a test!"));
+      .then((File file) => file.writeAsString(json.encode(playlist)))
+      .whenComplete(() => print("file written!"));
   }
 
   void createSong() {
@@ -74,13 +87,10 @@ class PlaylistStudioState extends State<PlaylistStudio> {
 
   Future<FileSystemEntity> backupAndDelete(BuildContext context) {
     // TODO: backup jsonData for undo
-
-    PlaylistPageState playlistView = context.ancestorStateOfType(
-      const TypeMatcher<PlaylistPageState>(),
-    );
+      
+    deleting = true; // temp fix
 
     return index.delete()
-      .whenComplete(() => playlistView.reloadPlaylists())
       .whenComplete(() => Navigator.pop(context));
   }
 

@@ -1,12 +1,12 @@
 
 import "package:flutter/material.dart";
 import "package:path/path.dart";
+import "package:uuid/uuid.dart";
 
 import "dart:io";
 import "dart:async";
 import "dart:convert";
 
-import "../pages/view_playlists.dart";
 import "../UI/song.dart";
 
 class PlaylistStudio extends StatefulWidget {
@@ -28,6 +28,19 @@ class PlaylistStudioState extends State<PlaylistStudio> {
 
   PlaylistStudioState(this.index) {
     name = basenameWithoutExtension(index.path);
+  }
+
+  void deleteSong(String id) {
+
+    List<Song> newList = List.from(playlist);
+    // bool success = newList.remove(toDelete);
+    int index = newList.indexWhere((Song s) => s.id == id);
+    newList.removeAt(index);
+
+    print("$index?");
+    setState(() {
+      playlist = newList;
+    });
   }
 
   @override
@@ -77,7 +90,8 @@ class PlaylistStudioState extends State<PlaylistStudio> {
     List<Song> newPlaylist = List.from(playlist);
 
     newPlaylist.add(new Song(
-      title: "Song 1"
+      title: "Song 1",
+      id: new Uuid().v4()
     ));
 
     setState(() {

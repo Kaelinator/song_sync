@@ -49,24 +49,48 @@ class SongState extends State<Song> {
   File address;
   bool fileExists = false;
   String id;
+  PlaylistStudioState playlistView;
 
   SongState({this.title, this.address, this.drops, this.id});
 
   void remove(BuildContext context) {
-    PlaylistStudioState playlistView = context.ancestorStateOfType(
-      const TypeMatcher<PlaylistStudioState>(),
-    );
+    
+    if (playlistView == null) {
+      playlistView = context.ancestorStateOfType(
+        const TypeMatcher<PlaylistStudioState>(),
+      );
+    }
 
     playlistView.deleteSong(id);
   }
 
   void updateValues(BuildContext context) {
 
-    PlaylistStudioState playlistView = context.ancestorStateOfType(
-      const TypeMatcher<PlaylistStudioState>(),
-    );
+    if (playlistView == null) {
+      playlistView = context.ancestorStateOfType(
+        const TypeMatcher<PlaylistStudioState>(),
+      );
+    }
 
     playlistView.updateSong(this);
+  }
+
+  void timestampsChange(String text, BuildContext context) {
+
+    List<Timestamp> newDrops = text
+      .split(";")
+      .map((String s) => new Timestamp.fromString(s))
+      .toList();
+
+    print("newDrops");
+
+    setState(() {
+      drops = newDrops;
+    });
+    print("setState");
+
+    updateValues(context);
+    print("updating");
   }
 
   void fileChange(String text, BuildContext context) {
@@ -97,16 +121,22 @@ class SongState extends State<Song> {
     return new Card(
       child: new Column(
         // mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           new ListTile(
             leading: const Icon(Icons.music_note),
             title: new Text(title)
           ),
+          const Text("File location:"),
           new TextField(
             onChanged: (String text) => fileChange(text, context),
             style: new TextStyle(
               color: (fileExists) ? Colors.black : Colors.red
             )
+          ),
+          const Text("Drop timestamps:"),
+          new TextField(
+            onChanged: (String text) => timestampsChange(text, context),
           ),
           new ButtonTheme.bar(
             child: new ButtonBar(

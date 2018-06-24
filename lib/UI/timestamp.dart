@@ -9,6 +9,11 @@ class Timestamp extends StatefulWidget {
 
   Timestamp({this.minutes, this.seconds, this.milliseconds});
 
+  Timestamp.fromString(String time)
+    : minutes = int.parse(time.split(":")[0]) ?? 0,
+      seconds = int.parse(time.split(":")[1]) ?? 0,
+      milliseconds = int.parse(time.split(":")[2]) ?? 0;
+
   Timestamp.fromJson(Map<String, dynamic> json)
       : minutes = json["minutes"] ?? 0,
         seconds = json["seconds"] ?? 0,

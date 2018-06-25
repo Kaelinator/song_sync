@@ -153,7 +153,12 @@ class PlayerState extends State<Player> {
   }
 
   void hopToDrop() {
-    
+    if (tMinus == -1) {
+      skip(1)
+        .then((int result) {
+          mainChannel.seek(playlist[songIndex].nextDrop(5) - 5.0);
+        });
+    }
     mainChannel.seek(songProgress * duration + tMinus - 5.0);
   }
 

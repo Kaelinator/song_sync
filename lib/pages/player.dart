@@ -152,6 +152,11 @@ class PlayerState extends State<Player> {
     mainChannel.seek(percent * duration);
   }
 
+  void hopToDrop() {
+    
+    mainChannel.seek(songProgress * duration + tMinus - 5.0);
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -236,7 +241,7 @@ class PlayerState extends State<Player> {
             ),
             child: new RaisedButton(
               color: Colors.redAccent,
-              onPressed: () => print("skip to drop"),
+              onPressed: hopToDrop,
               padding: EdgeInsets.all(32.0),
               child: const Text(
                 "Hop to next drop",
@@ -244,37 +249,39 @@ class PlayerState extends State<Player> {
               )
             ),
           ),
-          new Container(
-            padding: EdgeInsets.only(
-              top: 16.0,
-              bottom: 16.0
-            ),
-            child: new Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                new Container(
-                  padding: EdgeInsets.all(8.0),
-                  child: new Text(
-                    "T-Minus",
-                    style: const TextStyle(
-                      fontSize: 48.0
+          (tMinus < 0 || tMinus > 30)
+          ? new Container()
+          : new Container(
+              padding: EdgeInsets.only(
+                top: 16.0,
+                bottom: 16.0
+              ),
+              child: new Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  new Container(
+                    padding: EdgeInsets.all(8.0),
+                    child: new Text(
+                      "T-Minus",
+                      style: const TextStyle(
+                        fontSize: 48.0
+                      )
+                    )
+                  ),
+                  new Container(
+                    padding: EdgeInsets.all(8.0),
+                    child: new Text(
+                      "$tMinus",
+                      style: const TextStyle(
+                        fontSize: 64.0,
+                        fontWeight: FontWeight.bold
+                      )
                     )
                   )
-                ),
-                new Container(
-                  padding: EdgeInsets.all(8.0),
-                  child: new Text(
-                    "$tMinus",
-                    style: const TextStyle(
-                      fontSize: 64.0,
-                      fontWeight: FontWeight.bold
-                    )
-                  )
-                )
-              ],
+                ],
+              )
             )
-          )
         ],
       )
     );

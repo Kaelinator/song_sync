@@ -39,6 +39,8 @@ class PlayerState extends State<Player> {
 
   @override
   void initState() {
+
+    AudioPlayer.logEnabled = false;
     
     mainChannel = new AudioPlayer();
     fadeChannel = new AudioPlayer();
@@ -89,15 +91,24 @@ class PlayerState extends State<Player> {
   void skip(int moveBy) {
 
     int i = (songIndex + moveBy) % playlist.length;
+    print("new Index: $i");
 
-    mainChannel.play(playlist[i].address.path, isLocal: true)
+    mainChannel.stop()
       .then((int result) {
-        if (result == 1)
-          setState(() {
-            songIndex = i;
-            playing = true;
+
+        if (result == 0)
+          return;
+          
+        mainChannel.play(playlist[i].address.path, isLocal: true)
+          .then((int result) {
+            if (result == 1)
+              setState(() {
+                songIndex = i;
+                playing = true;
+              });
           });
       });
+
   }
 
   void togglePlaying() {

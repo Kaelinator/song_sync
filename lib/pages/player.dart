@@ -5,6 +5,7 @@ import "package:audioplayers/audioplayer.dart";
 
 import "dart:io";
 import "dart:convert";
+import "dart:async";
 
 import "../UI/song.dart";
 
@@ -88,24 +89,25 @@ class PlayerState extends State<Player> {
     super.dispose();
   }
 
-  void skip(int moveBy) {
+  Future<int> skip(int moveBy) {
 
     int i = (songIndex + moveBy) % playlist.length;
     print("new Index: $i");
 
-    mainChannel.stop()
+    return mainChannel.stop()
       .then((int result) {
 
         if (result == 0)
-          return;
+          return result;
 
-        mainChannel.play(playlist[i].address.path, isLocal: true)
+        return mainChannel.play(playlist[i].address.path, isLocal: true)
           .then((int result) {
             if (result == 1)
               setState(() {
                 songIndex = i;
                 playing = true;
               });
+            return result;
           });
       });
 
@@ -115,9 +117,20 @@ class PlayerState extends State<Player> {
 
     bool isPlaying = !playing;
 
-    if (isPlaying){
-      skip(0);
-      mainChannel.seek(duration as double);
+    if (isPlaying) {
+      double prevProgress = songProgress;
+
+      mainChannel.play(playlist[songIndex].address.path, isLocal: true)
+        .then((result) {
+          if (result == 0)
+            return;
+          
+          seek(prevProgress);
+
+          setState(() {
+            playing = isPlaying;
+          });
+        });
       return;
     }
 
@@ -132,6 +145,7 @@ class PlayerState extends State<Player> {
   }
 
   void seek(double percent) {
+
     mainChannel.seek(percent * duration);
   }
 
@@ -178,11 +192,40 @@ class PlayerState extends State<Player> {
               )
             ]
           ),
-          new Slider(
-            value: songProgress,
-            min: 0.0,
-            max: 1.0,
-            onChanged: seek
+          new Row(
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              new Container(
+                padding: EdgeInsets.only(
+                  left: 8.0
+                ),
+                child: new Text(
+                  new Duration(
+                    seconds: (songProgress * duration).round()
+                  ).toString()
+                  .substring(3, 7)
+                ),
+              ),
+              new Expanded(
+                child:new Slider(
+                  value: songProgress,
+                  min: 0.0,
+                  max: 1.0,
+                  onChanged: seek
+                )
+              ),
+              new Container(
+                padding: EdgeInsets.only(
+                  right: 8.0
+                ),
+                child: new Text(
+                  new Duration(
+                    seconds: (duration - songProgress * duration).round()
+                  ).toString()
+                  .substring(3, 7)
+                ),
+              )
+            ],
           ),
           new Container(
             padding: EdgeInsets.only(

@@ -98,7 +98,7 @@ class PlayerState extends State<Player> {
 
         if (result == 0)
           return;
-          
+
         mainChannel.play(playlist[i].address.path, isLocal: true)
           .then((int result) {
             if (result == 1)
@@ -129,6 +129,10 @@ class PlayerState extends State<Player> {
           });
         }
       });
+  }
+
+  void seek(double percent) {
+    mainChannel.seek(percent * duration);
   }
 
   @override
@@ -177,8 +181,8 @@ class PlayerState extends State<Player> {
           new Slider(
             value: songProgress,
             min: 0.0,
-            max: 3.0,
-            onChanged: (value) => setState(() => songProgress = value)
+            max: 1.0,
+            onChanged: seek
           ),
           new Container(
             padding: EdgeInsets.only(

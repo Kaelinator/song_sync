@@ -38,6 +38,13 @@ class Song extends StatefulWidget {
       "drops": (drops ?? []).toList()
     };
 
+  int nextDrop(int positionSec) {
+
+    return drops
+      .map((Timestamp t) => (t.toSeconds() - positionSec).round())
+      .firstWhere((int dist) => dist > 0, orElse: () => -1);
+  }
+
   @override
   SongState createState() => SongState(
       title: title,

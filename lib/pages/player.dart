@@ -28,7 +28,7 @@ class PlayerState extends State<Player> {
   final File playlistFile;
   List<Song> playlist;
   AudioPlayer mainChannel;
-  AudioPlayer fadeChannel;
+  // AudioPlayer fadeChannel;
 
   int songIndex = 0;
   double songProgress = 0.0;
@@ -44,15 +44,18 @@ class PlayerState extends State<Player> {
     AudioPlayer.logEnabled = false;
     
     mainChannel = new AudioPlayer();
-    fadeChannel = new AudioPlayer();
+    // fadeChannel = new AudioPlayer();
 
     mainChannel.setDurationHandler((Duration d) => setState(() {
       duration = d.inSeconds;
     }));
 
-    mainChannel.setPositionHandler((Duration d) => setState(() {
-      songProgress = d.inSeconds / duration;
-    }));
+    mainChannel.setPositionHandler((Duration d) {
+      setState(() {
+        songProgress = d.inSeconds / duration;
+        tMinus = playlist[songIndex].nextDrop(d.inSeconds);
+      });
+    });
 
     mainChannel.setCompletionHandler(() => skip(1));
 
@@ -84,7 +87,7 @@ class PlayerState extends State<Player> {
   void dispose() {
 
     mainChannel.stop();
-    fadeChannel.stop();
+    // fadeChannel.stop();
 
     super.dispose();
   }
@@ -145,7 +148,7 @@ class PlayerState extends State<Player> {
   }
 
   void seek(double percent) {
-
+    
     mainChannel.seek(percent * duration);
   }
 
@@ -241,37 +244,37 @@ class PlayerState extends State<Player> {
               )
             ),
           ),
-          // new Container(
-          //   padding: EdgeInsets.only(
-          //     top: 16.0,
-          //     bottom: 16.0
-          //   ),
-          //   child: new Row(
-          //     mainAxisSize: MainAxisSize.min,
-          //     mainAxisAlignment: MainAxisAlignment.center,
-          //     children: <Widget>[
-          //       new Container(
-          //         padding: EdgeInsets.all(8.0),
-          //         child: new Text(
-          //           "T-Minus",
-          //           style: const TextStyle(
-          //             fontSize: 48.0
-          //           )
-          //         )
-          //       ),
-          //       new Container(
-          //         padding: EdgeInsets.all(8.0),
-          //         child: new Text(
-          //           "$tMinus",
-          //           style: const TextStyle(
-          //             fontSize: 64.0,
-          //             fontWeight: FontWeight.bold
-          //           )
-          //         )
-          //       )
-          //     ],
-          //   )
-          // )
+          new Container(
+            padding: EdgeInsets.only(
+              top: 16.0,
+              bottom: 16.0
+            ),
+            child: new Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                new Container(
+                  padding: EdgeInsets.all(8.0),
+                  child: new Text(
+                    "T-Minus",
+                    style: const TextStyle(
+                      fontSize: 48.0
+                    )
+                  )
+                ),
+                new Container(
+                  padding: EdgeInsets.all(8.0),
+                  child: new Text(
+                    "$tMinus",
+                    style: const TextStyle(
+                      fontSize: 64.0,
+                      fontWeight: FontWeight.bold
+                    )
+                  )
+                )
+              ],
+            )
+          )
         ],
       )
     );

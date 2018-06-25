@@ -26,6 +26,10 @@ class Timestamp extends StatefulWidget {
       "milliseconds": milliseconds ?? 0
     };
 
+  double toSeconds() {
+    return minutes * 60 + seconds + milliseconds * 0.001;
+  }
+
   @override
   TimestampState createState() => TimestampState();
 }

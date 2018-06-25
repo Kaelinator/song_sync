@@ -81,7 +81,10 @@ class PlaylistStudioState extends State<PlaylistStudio> {
             print(data);
 
             List<Song> decoded = json.decode(data)
-              .map<Song>((dynamic v) => Song.fromJson(v))
+              .map<Song>((dynamic v) => Song.fromJson(v,
+                update: updateSong,
+                delete: deleteSong
+              ))
               .toList();
 
             setState(() {
@@ -116,7 +119,9 @@ class PlaylistStudioState extends State<PlaylistStudio> {
 
     newPlaylist.add(new Song(
       title: "Song ${playlist.length}",
-      id: new Uuid().v4()
+      id: new Uuid().v4(),
+      update: updateSong,
+      delete: deleteSong
     ));
 
     setState(() {

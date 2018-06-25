@@ -9,16 +9,21 @@ import "dart:io";
 import "./timestamp.dart";
 import "../pages/playlist_studio.dart";
 
+typedef void UpdateSongCallback(SongState song);
+typedef void DeleteSongCallback(String id);
+
 class Song extends StatefulWidget {
 
   final List<Timestamp> drops;
   final String title;
   final File address;
   final String id;
+  final UpdateSongCallback update;
+  final DeleteSongCallback delete;
 
-  Song({this.title, this.address, this.drops, this.id});
+  Song({this.title, this.address, this.drops, this.id, this.update, this.delete});
 
-  Song.fromJson(Map<String, dynamic> json)
+  Song.fromJson(Map<String, dynamic> json, {this.update, this.delete})
       : title = json["title"],
         address = new File(json["address"]),
         drops = json["drops"]
@@ -29,7 +34,7 @@ class Song extends StatefulWidget {
   Map<String, dynamic> toJson() =>
     {
       "title": title,
-      "address": address.path,
+      "address": address?.path ?? null,
       "drops": (drops ?? []).toList()
     };
 
@@ -38,7 +43,9 @@ class Song extends StatefulWidget {
       title: title,
       address: address,
       drops: drops,
-      id: id
+      id: id,
+      update: update,
+      delete: delete
     );
 }
 
@@ -50,29 +57,14 @@ class SongState extends State<Song> {
   bool fileExists = false;
   String id;
   PlaylistStudioState playlistView;
+  final UpdateSongCallback update;
+  final DeleteSongCallback delete;
 
-  SongState({this.title, this.address, this.drops, this.id});
+  SongState({this.title, this.address, this.drops, this.id, this.update, this.delete});
 
   void remove(BuildContext context) {
     
-    if (playlistView == null) {
-      playlistView = context.ancestorStateOfType(
-        const TypeMatcher<PlaylistStudioState>(),
-      );
-    }
-
-    playlistView.deleteSong(id);
-  }
-
-  void updateValues(BuildContext context) {
-
-    if (playlistView == null) {
-      playlistView = context.ancestorStateOfType(
-        const TypeMatcher<PlaylistStudioState>(),
-      );
-    }
-
-    playlistView.updateSong(this);
+    delete(id);
   }
 
   void timestampsChange(String text, BuildContext context) {
@@ -82,15 +74,9 @@ class SongState extends State<Song> {
       .map((String s) => new Timestamp.fromString(s))
       .toList();
 
-    print("newDrops");
-
     setState(() {
       drops = newDrops;
     });
-    print("setState");
-
-    updateValues(context);
-    print("updating");
   }
 
   void fileChange(String text, BuildContext context) {
@@ -111,9 +97,15 @@ class SongState extends State<Song> {
               fileExists = isThere;
               title = basenameWithoutExtension(address.path);
             });
-            updateValues(context);
           });
     });
+  }
+
+  @override
+  void dispose() {
+
+    update(this);
+    super.dispose();
   }
 
   @override
